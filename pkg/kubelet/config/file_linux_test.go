@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -34,7 +33,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/testapi"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	k8s_api_v1 "k8s.io/kubernetes/pkg/apis/core/v1"
@@ -131,11 +129,10 @@ func TestWatchFileChanged(t *testing.T) {
 }
 
 type testCase struct {
-	lock       *sync.Mutex
-	desc       string
-	linkedFile string
-	pod        runtime.Object
-	expected   kubetypes.PodUpdate
+	lock     *sync.Mutex
+	desc     string
+	pod      runtime.Object
+	expected kubetypes.PodUpdate
 }
 
 func getTestCases(hostname types.NodeName) []*testCase {
@@ -202,12 +199,7 @@ func getTestCases(hostname types.NodeName) []*testCase {
 }
 
 func (tc *testCase) writeToFile(dir, name string, t *testing.T) string {
-	var versionedPod runtime.Object
-	err := legacyscheme.Scheme.Convert(&tc.pod, &versionedPod, nil)
-	if err != nil {
-		t.Fatalf("%s: error in versioning the pod: %v", tc.desc, err)
-	}
-	fileContents, err := runtime.Encode(testapi.Default.Codec(), versionedPod)
+	fileContents, err := runtime.Encode(testapi.Default.Codec(), tc.pod)
 	if err != nil {
 		t.Fatalf("%s: error in encoding the pod: %v", tc.desc, err)
 	}
@@ -428,7 +420,7 @@ func writeFile(filename string, data []byte) error {
 func changeFileName(dir, from, to string, t *testing.T) {
 	fromPath := filepath.Join(dir, from)
 	toPath := filepath.Join(dir, to)
-	if err := exec.Command("mv", fromPath, toPath).Run(); err != nil {
+	if err := os.Rename(fromPath, toPath); err != nil {
 		t.Errorf("Fail to change file name: %s", err)
 	}
 }

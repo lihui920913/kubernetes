@@ -18,14 +18,14 @@ go_library(
     ],
     importpath = "k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm",
     deps = [
-        "//pkg/kubelet/apis/config:go_default_library",
-        "//pkg/proxy/apis/config:go_default_library",
         "//staging/src/k8s.io/api/core/v1:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
         "//staging/src/k8s.io/cluster-bootstrap/token/api:go_default_library",
         "//staging/src/k8s.io/cluster-bootstrap/token/util:go_default_library",
+        "//staging/src/k8s.io/cluster-bootstrap/util/secrets:go_default_library",
+        "//vendor/github.com/pkg/errors:go_default_library",
     ],
 )
 
@@ -42,8 +42,8 @@ filegroup(
         ":package-srcs",
         "//cmd/kubeadm/app/apis/kubeadm/fuzzer:all-srcs",
         "//cmd/kubeadm/app/apis/kubeadm/scheme:all-srcs",
-        "//cmd/kubeadm/app/apis/kubeadm/v1alpha3:all-srcs",
         "//cmd/kubeadm/app/apis/kubeadm/v1beta1:all-srcs",
+        "//cmd/kubeadm/app/apis/kubeadm/v1beta2:all-srcs",
         "//cmd/kubeadm/app/apis/kubeadm/validation:all-srcs",
     ],
     tags = ["automanaged"],
@@ -59,5 +59,6 @@ go_test(
     deps = [
         "//staging/src/k8s.io/api/core/v1:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
+        "//vendor/github.com/pkg/errors:go_default_library",
     ],
 )

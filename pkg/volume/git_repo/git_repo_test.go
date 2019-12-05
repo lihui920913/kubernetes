@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -40,7 +40,7 @@ func newTestHost(t *testing.T) (string, volume.VolumeHost) {
 	if err != nil {
 		t.Fatalf("can't make a temp rootdir: %v", err)
 	}
-	return tempDir, volumetest.NewFakeVolumeHost(tempDir, nil, emptydir.ProbeVolumePlugins())
+	return tempDir, volumetest.NewFakeVolumeHost(t, tempDir, nil, emptydir.ProbeVolumePlugins())
 }
 
 func TestCanSupport(t *testing.T) {
@@ -393,7 +393,7 @@ func doTestSetUp(scenario struct {
 		if expected.cmd[1] == "clone" {
 			fakeOutputs = append(fakeOutputs, func() ([]byte, error) {
 				// git clone, it creates new dir/files
-				os.MkdirAll(path.Join(fcmd.Dirs[0], expected.dir), 0750)
+				os.MkdirAll(filepath.Join(fcmd.Dirs[0], expected.dir), 0750)
 				return []byte{}, nil
 			})
 		} else {
@@ -422,7 +422,7 @@ func doTestSetUp(scenario struct {
 	g := mounter.(*gitRepoVolumeMounter)
 	g.exec = &fake
 
-	g.SetUp(nil)
+	g.SetUp(volume.MounterArgs{})
 
 	if fake.CommandCalls != len(expecteds) {
 		allErrs = append(allErrs,

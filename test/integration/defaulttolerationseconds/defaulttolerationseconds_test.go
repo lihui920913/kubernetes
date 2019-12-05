@@ -25,7 +25,6 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/kubernetes/pkg/apis/core/helper"
-	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 	"k8s.io/kubernetes/plugin/pkg/admission/defaulttolerationseconds"
 	"k8s.io/kubernetes/test/integration/framework"
 )
@@ -57,21 +56,21 @@ func TestAdmission(t *testing.T) {
 		},
 	}
 
-	updatedPod, err := client.Core().Pods(pod.Namespace).Create(&pod)
+	updatedPod, err := client.CoreV1().Pods(pod.Namespace).Create(&pod)
 	if err != nil {
 		t.Fatalf("error creating pod: %v", err)
 	}
 
 	var defaultSeconds int64 = 300
 	nodeNotReady := v1.Toleration{
-		Key:               schedulerapi.TaintNodeNotReady,
+		Key:               v1.TaintNodeNotReady,
 		Operator:          v1.TolerationOpExists,
 		Effect:            v1.TaintEffectNoExecute,
 		TolerationSeconds: &defaultSeconds,
 	}
 
 	nodeUnreachable := v1.Toleration{
-		Key:               schedulerapi.TaintNodeUnreachable,
+		Key:               v1.TaintNodeUnreachable,
 		Operator:          v1.TolerationOpExists,
 		Effect:            v1.TaintEffectNoExecute,
 		TolerationSeconds: &defaultSeconds,
